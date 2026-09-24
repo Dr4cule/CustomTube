@@ -1,3 +1,7 @@
+
+
+
+
 <p align="center">
   <img src="src/customtube.png" alt="CustomTube logo" width="140">
 </p>
@@ -30,7 +34,12 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://drive.google.com/file/d/1hqg0ZotXJ3UJ8zEiNZfn8htaVKPTv29l/view?usp=sharing"><b>▶ Watch the demo</b></a>
+  <video
+    src="https://github.com/user-attachments/assets/94a5e363-c367-4f5d-96bd-ab3676993f7b"
+    width="760"
+    controls
+    playsinline
+  ></video>
 </p>
 
 ## Why you'll like it
