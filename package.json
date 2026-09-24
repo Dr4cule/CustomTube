@@ -1,0 +1,16 @@
+{
+  "name": "youtube-personalizer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local, client-side semantic visibility layer for YouTube (Chrome MV3).",
+  "scripts": {
+    "test": "node --test",
+    "test:e2e": "playwright test",
+    "test:load": "node test-pages/load-check.cjs",
+    "stub": "node test-pages/stub-server.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube Personalizer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>YouTube Personalizer</h1>
+      <div class="status" id="status">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Loading…</span>
+      </div>
+    </header>
+
+    <p class="note">
+      This changes only what is shown after YouTube renders. It does not change
+      YouTube's recommendations.
+    </p>
+
+    <section>
+      <h2>Your rule</h2>
+      <p class="rule" id="ruleSummary">No rule set. Open YouTube and use the search-bar control to set one.</p>
+    </section>
+
+    <section>
+      <h2>AI provider</h2>
+      <label>
+        Backend
+        <select id="providerId">
+          <option value="none">None (local rules only)</option>
+          <option value="gemini">Google Gemini (free API key)</option>
+          <option value="openrouter">OpenRouter (many models, one key)</option>
+          <option value="openai-compatible">OpenAI-compatible (OpenAI, Ollama, LM Studio…)</option>
+        </select>
+      </label>
+      <div id="providerFields" hidden>
+        <p class="note small" id="geminiHelp" hidden>Free key: create one at aistudio.google.com/apikey, paste it below, then click "Grant access to this endpoint".</p>
+        <p class="note small" id="openrouterHelp" hidden>Get a key at openrouter.ai/keys, paste it below, then click "Grant access to this endpoint". Change Model to any OpenRouter id (e.g. a ":free" model).</p>
+        <label>Base URL
+          <input id="baseURL" type="url" placeholder="https://api.openai.com/v1" autocomplete="off" />
+        </label>
+        <label>Model
+          <input id="model" type="text" placeholder="gpt-4o-mini" autocomplete="off" />
+        </label>
+        <label>API key
+          <input id="apiKey" type="password" placeholder="Stored locally, read only by the worker" autocomplete="off" />
+        </label>
+        <button id="requestPerm" type="button" class="secondary">Grant access to this endpoint</button>
+        <p class="perm" id="permState"></p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Surfaces</h2>
+      <label class="row"><input type="checkbox" id="surface-home" /> Home grid</label>
+      <label class="row"><input type="checkbox" id="surface-watch" /> Watch-page sidebar</label>
+      <label class="row"><input type="checkbox" id="surface-subscriptions" /> Subscriptions feed</label>
+      <label class="row"><input type="checkbox" id="surface-search" /> Search results</label>
+    </section>
+
+    <section>
+      <h2>Behavior</h2>
+      <label>Pending cards
+        <select id="pendingStyle">
+          <option value="dim">Dim while deciding</option>
+          <option value="show">Show while deciding</option>
+        </select>
+      </label>
+      <label>Strictness
+        <select id="strictness">
+          <option value="cautious">Cautious — hide only very confident matches</option>
+          <option value="balanced">Balanced</option>
+          <option value="aggressive">Aggressive — hide on weaker signals</option>
+        </select>
+      </label>
+      <div class="grid2">
+        <label>Requests / minute
+          <input id="rpm" type="number" min="1" max="600" />
+        </label>
+        <label>Requests / day
+          <input id="rpd" type="number" min="1" max="100000" />
+        </label>
+      </div>
+      <label class="row"><input type="checkbox" id="persistCache" /> Remember decisions locally (cache)</label>
+      <label class="row"><input type="checkbox" id="debug" /> Debug logging</label>
+    </section>
+
+    <section>
+      <button id="clearData" type="button" class="danger">Clear cached decisions</button>
+      <p class="note small">Cached video IDs are a form of viewing metadata; they are capped, expiring, optional, and never leave your device.</p>
+    </section>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

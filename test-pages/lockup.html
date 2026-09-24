@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture — lockup markup (Watch sidebar)</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; }
+      ytd-masthead { display: flex; align-items: center; height: 56px; padding: 0 16px; border-bottom: 1px solid #ddd; }
+      #center { display: flex; flex: 1; align-items: center; }
+      #contents { display: flex; flex-direction: column; gap: 12px; padding: 16px; max-width: 420px; }
+      yt-lockup-view-model { display: block; border: 1px solid #eee; padding: 8px; }
+      .ytLockupMetadataViewModelTitle { font-weight: 600; display: block; }
+      .controls { padding: 8px 16px; background: #fafafa; border-bottom: 1px solid #eee; }
+    </style>
+  </head>
+  <body>
+    <ytd-app>
+      <ytd-masthead>
+        <div id="start">≡ YouTube</div>
+        <div id="center"><input placeholder="Search" /><div id="voice-search-button">🎤</div></div>
+        <div id="end">buttons</div>
+      </ytd-masthead>
+
+      <div class="controls">
+        <button onclick="__fixture.burst(20)">+20 cards</button>
+        <button onclick="__fixture.hydrate()">add skeleton then hydrate</button>
+        <button onclick="__fixture.recycle()">recycle first card → music</button>
+      </div>
+
+      <ytd-page-manager>
+        <div id="contents"></div>
+      </ytd-page-manager>
+    </ytd-app>
+
+    <script>
+      const CARDS = [
+        { id: "graphAlgo01", title: "Introduction to Graph Algorithms", channel: "Computer Science Academy", dur: "12:34" },
+        { id: "lofiBeats01", title: "Lofi Beats to Study To", channel: "Chillhop Music", dur: "1:02:00" },
+        { id: "taylorSwt1x", title: "Taylor Swift - Blank Space", channel: "TaylorSwiftVEVO", dur: "3:52" },
+        { id: "linuxProc01", title: "How Linux Processes Work", channel: "Systems Explained", dur: "18:20" },
+        { id: "morningRt01", title: "My Morning Routine", channel: "Daily Life", dur: "9:10" },
+        // Art-track with the ♪ badge but an AI-opaque title (the FLOWER DAY FUNK case):
+        // baseline can't catch it, so only the on-card music badge hides it.
+        { id: "flowerFunk1", title: "FLOWER DAY FUNK", channel: "Phonk Nation", dur: "2:12", music: true },
+      ];
+
+      // YouTube's ♪ art-track glyph, rendered as an <svg> inside the duration badge
+      // on lockup cards (legacy search uses the time-status overlay's [has-icon] instead).
+      const MUSIC_NOTE_SVG = `<badge-shape class="ytBadgeShapeThumbnailBadge"><div class="ytBadgeShapeIcon"><svg viewBox="0 0 12 12"><path d="M5.5 1.383V6.88a2 2 0 1 0 1 1.732z"></path></svg></div></badge-shape>`;
+
+      // Current (2026) camelCase view-model markup used by home/watch/subscriptions.
+      // The channel is the FIRST metadata-text span (a plain span, not a link); a
+      // second row carries views·date to prove selectors pick the channel, not views.
+      function lockupCard(v) {
+        const el = document.createElement("yt-lockup-view-model");
+        el.dataset.testid = v.id;
+        el.innerHTML = `
+          <div class="ytLockupViewModelHost">
+            <a class="ytLockupViewModelContentImage" href="/watch?v=${v.id}" title="${v.title}">
+              <badge-shape class="ytBadgeShapeHost"><div class="ytBadgeShapeText">${v.dur}</div></badge-shape>
+              ${v.music ? MUSIC_NOTE_SVG : ""}
+            </a>
+            <div class="ytLockupViewModelMetadata">
+              <yt-lockup-metadata-view-model class="ytLockupMetadataViewModelHost">
+                <div class="ytLockupMetadataViewModelTextContainer">
+                  <h3 class="ytLockupMetadataViewModelHeadingReset">
+                    <a class="ytLockupMetadataViewModelTitle" href="/watch?v=${v.id}" aria-label="${v.title}"><span class="ytAttributedStringHost">${v.title}</span></a>
+                  </h3>
+                  <div class="ytLockupMetadataViewModelMetadata">
+                    <yt-content-metadata-view-model class="ytContentMetadataViewModelHost">
+                      <div class="ytContentMetadataViewModelMetadataRow"><span class="ytContentMetadataViewModelMetadataText">${v.channel}</span></div>
+                      <div class="ytContentMetadataViewModelMetadataRow"><span class="ytContentMetadataViewModelMetadataText">1.2M views</span><span class="ytContentMetadataViewModelMetadataText">3 days ago</span></div>
+                    </yt-content-metadata-view-model>
+                  </div>
+                </div>
+              </yt-lockup-metadata-view-model>
+            </div>
+          </div>`;
+        return el;
+      }
+
+      const contents = document.getElementById("contents");
+      CARDS.forEach((v) => contents.appendChild(lockupCard(v)));
+
+      let burstN = 0;
+      window.__fixture = {
+        burst(n) {
+          for (let i = 0; i < n; i++) {
+            burstN++;
+            contents.appendChild(lockupCard({ id: ("burst" + burstN).padEnd(11, "0").slice(0, 11), title: "Official Music Video " + burstN, channel: "VEVO", dur: "3:00" }));
+          }
+        },
+        hydrate() {
+          const el = document.createElement("yt-lockup-view-model");
+          el.dataset.testid = "hydrated001";
+          el.innerHTML = `<div class="ytLockupViewModelHost"><a class="ytLockupViewModelContentImage" href="/watch?v=hydrated001"></a><div class="ytLockupViewModelMetadata"><yt-lockup-metadata-view-model class="ytLockupMetadataViewModelHost"><div class="ytLockupMetadataViewModelTextContainer"><h3 class="ytLockupMetadataViewModelHeadingReset"></h3></div></yt-lockup-metadata-view-model></div></div>`;
+          contents.appendChild(el); // skeleton: no title
+          requestAnimationFrame(() => {
+            const h3 = el.querySelector("h3");
+            h3.innerHTML = `<a class="ytLockupMetadataViewModelTitle" href="/watch?v=hydrated001" aria-label="Official Music Video (late)"><span class="ytAttributedStringHost">Official Music Video (late)</span></a>`;
+          });
+        },
+        recycle() {
+          const el = contents.querySelector('[data-testid="graphAlgo01"]');
+          el.querySelectorAll("a").forEach((a) => a.getAttribute("href") && a.setAttribute("href", "/watch?v=recycled001"));
+          el.querySelector(".ytLockupMetadataViewModelTitle span").textContent = "Official Music Video — recycled";
+        },
+      };
+    </script>
+    <script type="module" src="/harness.js"></script>
+  </body>
+</html>

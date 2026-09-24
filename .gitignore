@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Test / build artifacts
+test-results/
+playwright-report/
+.playwright-mcp/
+
+# Demo video is hosted on Google Drive (linked from the README), not committed
+src/YouTube.mp4
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log

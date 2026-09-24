@@ -1,0 +1,24 @@
+/*
+ * Page-level visibility rules only (spec §7). The masthead UI lives in a Shadow
+ * DOM and styles itself; nothing here leaks into YouTube beyond these attributes.
+ *
+ * We hide by *not matching* when "Show all" is active (html[data-ytp-reveal]),
+ * rather than trying to override display:none — that restores YouTube's own
+ * layout cleanly without fighting its inline styles.
+ */
+html:not([data-ytp-reveal]) [data-ytp="hidden"] {
+  display: none !important;
+}
+
+/* Pending cards are dimmed (default) so a strict rule doesn't flash unwanted
+   content followed by a layout jump. "show" style leaves them fully visible. */
+html:not([data-ytp-reveal])[data-ytp-pending="dim"] [data-ytp="pending"] {
+  opacity: 0.35;
+  transition: opacity 0.12s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ytp="pending"] {
+    transition: none !important;
+  }
+}

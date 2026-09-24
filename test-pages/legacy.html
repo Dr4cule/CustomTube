@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fixture — legacy markup (Home)</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; }
+      ytd-masthead { display: flex; align-items: center; height: 56px; padding: 0 16px; border-bottom: 1px solid #ddd; }
+      #center { display: flex; flex: 1; align-items: center; }
+      #contents { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 16px; }
+      ytd-rich-item-renderer { display: block; border: 1px solid #eee; padding: 8px; }
+      #video-title { font-weight: 600; display: block; }
+      .controls { padding: 8px 16px; background: #fafafa; border-bottom: 1px solid #eee; }
+    </style>
+  </head>
+  <body>
+    <ytd-app>
+      <ytd-masthead>
+        <div id="start">≡ YouTube</div>
+        <div id="center"><input placeholder="Search" /><div id="voice-search-button">🎤</div></div>
+        <div id="end">buttons</div>
+      </ytd-masthead>
+
+      <div class="controls">
+        <button onclick="__fixture.burst(20)">+20 cards</button>
+        <button onclick="__fixture.hydrate()">add skeleton then hydrate</button>
+        <button onclick="__fixture.recycle()">recycle first card → music</button>
+      </div>
+
+      <ytd-page-manager>
+        <div id="contents"></div>
+      </ytd-page-manager>
+    </ytd-app>
+
+    <script>
+      const CARDS = [
+        { id: "graphAlgo01", title: "Introduction to Graph Algorithms", channel: "Computer Science Academy", dur: "12:34" },
+        { id: "lofiBeats01", title: "Lofi Beats to Study To", channel: "Chillhop Music", dur: "1:02:00" },
+        { id: "taylorSwt1x", title: "Taylor Swift - Blank Space", channel: "TaylorSwiftVEVO", dur: "3:52" },
+        { id: "linuxProc01", title: "How Linux Processes Work", channel: "Systems Explained", dur: "18:20" },
+        { id: "morningRt01", title: "My Morning Routine", channel: "Daily Life", dur: "9:10" },
+      ];
+
+      function legacyCard(v) {
+        const el = document.createElement("ytd-rich-item-renderer");
+        el.dataset.testid = v.id;
+        el.innerHTML = `
+          <div id="content">
+            <a id="thumbnail" href="/watch?v=${v.id}"></a>
+            <a id="video-title-link" href="/watch?v=${v.id}">
+              <yt-formatted-string id="video-title">${v.title}</yt-formatted-string>
+            </a>
+            <ytd-channel-name><div id="text"><a href="/@c">${v.channel}</a></div></ytd-channel-name>
+            <ytd-thumbnail-overlay-time-status-renderer><span id="text">${v.dur}</span></ytd-thumbnail-overlay-time-status-renderer>
+          </div>`;
+        return el;
+      }
+
+      const contents = document.getElementById("contents");
+      CARDS.forEach((v) => contents.appendChild(legacyCard(v)));
+
+      let burstN = 0;
+      window.__fixture = {
+        burst(n) {
+          for (let i = 0; i < n; i++) {
+            burstN++;
+            contents.appendChild(legacyCard({ id: ("burst" + burstN).padEnd(11, "0").slice(0, 11), title: "Official Music Video " + burstN, channel: "VEVO", dur: "3:00" }));
+          }
+        },
+        hydrate() {
+          const el = document.createElement("ytd-rich-item-renderer");
+          el.dataset.testid = "hydrated001";
+          el.innerHTML = `<div id="content"><a id="video-title-link" href="/watch?v=hydrated001"></a></div>`;
+          contents.appendChild(el); // skeleton: no title yet
+          requestAnimationFrame(() => {
+            const link = el.querySelector("#video-title-link");
+            const t = document.createElement("yt-formatted-string");
+            t.id = "video-title";
+            t.textContent = "Official Music Video (late)";
+            link.appendChild(t);
+          });
+        },
+        recycle() {
+          const el = contents.querySelector('[data-testid="graphAlgo01"]');
+          el.querySelector("#video-title-link").setAttribute("href", "/watch?v=recycled001");
+          el.querySelector("#thumbnail").setAttribute("href", "/watch?v=recycled001");
+          el.querySelector("#video-title").textContent = "Official Music Video — recycled";
+        },
+      };
+    </script>
+    <script type="module" src="/harness.js"></script>
+  </body>
+</html>
