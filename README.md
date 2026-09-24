@@ -173,7 +173,7 @@ Adding a native backend is a small class with `compilePolicy()` + `classifyBatch
 - **API cost / latency.** Semantic calls hit your provider; the budget guard caps usage and everything degrades to local rules when unavailable.
 
 ## To Do
-- **Integrate Laya 1.7gb local model (if you can do this, make a pr)
+- **Integrate Laya 1.7gb local model (if you can do this, make a pr)**
 
 ---
 
